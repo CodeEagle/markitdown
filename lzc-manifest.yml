@@ -26,7 +26,7 @@ application:
 services:
   markitdown-mcp:
     image: registry.lazycat.cloud/invokerlaw/codeeagle/markitdown:a3d7ee16b84f6446
-    command: markitdown-mcp --http --host 0.0.0.0 --port 3001
+    command: --http --host 0.0.0.0 --port 3001
     environment:
       - MARKITDOWN_ENABLE_PLUGINS=true
     binds:
