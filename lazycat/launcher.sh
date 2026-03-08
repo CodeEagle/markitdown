@@ -8,6 +8,9 @@ if [ "$#" -gt 0 ]; then
 fi
 
 case "$mode" in
+  all)
+    exec python /app/packages/lazycat-markitdown-web/run_services.py "$@"
+    ;;
   mcp)
     exec markitdown-mcp "$@"
     ;;
