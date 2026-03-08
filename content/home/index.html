@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MarkItDown MCP</title>
+    <style>
+      :root {
+        --bg: #f5efe4;
+        --paper: rgba(255, 252, 246, 0.84);
+        --ink: #1d1a17;
+        --muted: #5c564f;
+        --line: rgba(29, 26, 23, 0.12);
+        --accent: #b74b2a;
+        --accent-2: #1b6f6a;
+        --shadow: 0 28px 70px rgba(45, 34, 22, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(183, 75, 42, 0.18), transparent 30%),
+          radial-gradient(circle at top right, rgba(27, 111, 106, 0.16), transparent 28%),
+          linear-gradient(135deg, #f7f1e6 0%, #efe7d9 100%);
+      }
+
+      .shell {
+        width: min(1100px, calc(100% - 32px));
+        margin: 32px auto;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(183, 75, 42, 0.1);
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: clamp(40px, 6vw, 72px);
+        line-height: 0.95;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .lead {
+        max-width: 760px;
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 28px;
+      }
+
+      .card {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.65);
+      }
+
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .endpoint {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: rgba(27, 111, 106, 0.08);
+        color: var(--accent-2);
+        font-family: "SFMono-Regular", "Menlo", monospace;
+        font-size: 14px;
+      }
+
+      .panel {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background: #191613;
+        color: #f5efe4;
+      }
+
+      .panel pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: "SFMono-Regular", "Menlo", monospace;
+        line-height: 1.7;
+      }
+
+      .tips {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .tip {
+        padding: 16px;
+        border-left: 4px solid var(--accent);
+        background: rgba(183, 75, 42, 0.08);
+        border-radius: 14px;
+      }
+
+      .tip strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          padding: 20px;
+          margin: 16px auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <span class="eyebrow">LazyCat Migration</span>
+      <h1>MarkItDown<br />MCP</h1>
+      <p class="lead">
+        这个实例运行的是 Microsoft MarkItDown 的 HTTP MCP 服务。根路径提供说明页，真正的 MCP
+        入口位于 <code>/mcp</code> 与 <code>/sse</code>。
+      </p>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Streamable HTTP</h2>
+          <p>适合新的 MCP 客户端，直接把服务地址指向该端点。</p>
+          <span class="endpoint">/mcp</span>
+        </article>
+        <article class="card">
+          <h2>SSE</h2>
+          <p>兼容基于 Server-Sent Events 的 MCP 调试与集成方式。</p>
+          <span class="endpoint">/sse</span>
+        </article>
+        <article class="card">
+          <h2>Workdir</h2>
+          <p>懒猫数据目录被挂载到容器内 <code>/workdir</code>，可用文件 URI 访问。</p>
+          <span class="endpoint">file:///workdir/&lt;filename&gt;</span>
+        </article>
+      </section>
+
+      <section class="panel">
+        <pre>{
+  "tool": "convert_to_markdown",
+  "examples": [
+    "https://example.com/report.pdf",
+    "file:///workdir/sample.docx",
+    "data:text/plain;base64,SGVsbG8sIE1hcmtJdERvd24h"
+  ]
+}</pre>
+      </section>
+
+      <section class="tips">
+        <article class="tip">
+          <strong>Inspector 调试</strong>
+          使用 MCP Inspector 时，把服务地址设置为当前应用域名下的 <code>/mcp</code>。
+        </article>
+        <article class="tip">
+          <strong>本地文件</strong>
+          先把待转换文件放到懒猫的 <code>/lzcapp/var/data</code>，再通过
+          <code>file:///workdir/...</code> 调用。
+        </article>
+        <article class="tip">
+          <strong>注意事项</strong>
+          该服务默认不带认证；如需公网使用，请结合上层路由或网关策略控制访问。
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

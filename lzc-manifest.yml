@@ -1,0 +1,40 @@
+lzc-sdk-version: '0.1'
+package: fun.selfstudio.app.migration.microsoft.markitdown-mcp
+version: 0.1.5
+min_os_version: 1.3.8
+name: MarkItDown MCP
+description: (LazyCat Auto-build) MCP server for converting files and URLs to Markdown
+license: MIT
+homepage: https://github.com/microsoft/markitdown
+author: Adam Fourney, Microsoft
+application:
+  subdomain: markitdown
+  routes:
+    - /=file:///lzcapp/pkg/content/home
+  public_path:
+    - /
+    - /mcp
+    - /sse
+    - /messages/
+  upstreams:
+    - location: /mcp
+      backend: http://markitdown-mcp:3001/
+    - location: /sse
+      backend: http://markitdown-mcp:3001/
+    - location: /messages/
+      backend: http://markitdown-mcp:3001/
+services:
+  markitdown-mcp:
+    image: registry.lazycat.cloud/lincoln/markitdown:v0.1.5
+    command: markitdown-mcp --http --host 0.0.0.0 --port 3001
+    environment:
+      - MARKITDOWN_ENABLE_PLUGINS=true
+    binds:
+      - /lzcapp/var/data:/workdir
+locales:
+  en:
+    name: MarkItDown MCP
+    description: (LazyCat Auto-build) MCP server for converting files and URLs to Markdown
+  zh:
+    name: MarkItDown MCP
+    description: （懒猫微服自动构建）将文件和 URL 转换为 Markdown 的 MCP 服务
