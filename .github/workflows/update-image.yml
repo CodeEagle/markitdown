@@ -94,7 +94,8 @@ jobs:
           ARCHIVE_URL="https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tarball/$SOURCE_VERSION"
           mkdir -p /tmp/markitdown-source
           curl -L "$ARCHIVE_URL" | tar -xz -C /tmp/markitdown-source --strip-components=1
-          cp -R "${{ github.workspace }}/lazycat" /tmp/markitdown-source/lazycat
+          mkdir -p /tmp/markitdown-source/packages/lazycat-markitdown-web
+          cp -R "${{ github.workspace }}/lazycat"/. /tmp/markitdown-source/packages/lazycat-markitdown-web/
 
       - name: Build and push image to ghcr.io
         if: steps.check-update.outputs.update_needed == 'true'
