@@ -23,7 +23,7 @@ on:
 
 env:
   UPSTREAM_REPO: microsoft/markitdown
-  PROJECT_NAME: MarkItDown MCP
+  PROJECT_NAME: MarkItDown Web & MCP
   PROJECT_SLUG: markitdown
 
 jobs:
@@ -94,6 +94,7 @@ jobs:
           ARCHIVE_URL="https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tarball/$SOURCE_VERSION"
           mkdir -p /tmp/markitdown-source
           curl -L "$ARCHIVE_URL" | tar -xz -C /tmp/markitdown-source --strip-components=1
+          cp -R "${{ github.workspace }}/lazycat" /tmp/markitdown-source/lazycat
 
       - name: Build and push image to ghcr.io
         if: steps.check-update.outputs.update_needed == 'true'

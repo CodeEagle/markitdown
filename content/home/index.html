@@ -3,16 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MarkItDown MCP</title>
+    <title>MarkItDown Web + MCP</title>
     <style>
       :root {
         --bg: #f5efe4;
-        --paper: rgba(255, 252, 246, 0.84);
+        --paper: rgba(255, 252, 246, 0.9);
         --ink: #1d1a17;
         --muted: #5c564f;
         --line: rgba(29, 26, 23, 0.12);
         --accent: #b74b2a;
         --accent-2: #1b6f6a;
+        --accent-3: #d8a71f;
         --shadow: 0 28px 70px rgba(45, 34, 22, 0.14);
       }
 
@@ -101,6 +102,89 @@
         font-size: 14px;
       }
 
+      .stack {
+        display: grid;
+        gap: 18px;
+        margin-top: 24px;
+      }
+
+      .composer {
+        display: grid;
+        gap: 14px;
+        padding: 22px;
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .composer h2,
+      .panel h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      input[type="url"],
+      input[type="file"],
+      textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(29, 26, 23, 0.14);
+        background: rgba(255, 255, 255, 0.88);
+        color: var(--ink);
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 320px;
+        resize: vertical;
+        font-family: "SFMono-Regular", "Menlo", monospace;
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font: inherit;
+        cursor: pointer;
+        transition: transform 140ms ease, box-shadow 140ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        background: var(--accent);
+        color: #fff9f2;
+        box-shadow: 0 12px 24px rgba(183, 75, 42, 0.22);
+      }
+
+      .secondary {
+        background: rgba(27, 111, 106, 0.12);
+        color: var(--accent-2);
+      }
+
+      .ghost {
+        background: rgba(216, 167, 31, 0.14);
+        color: #7a5c00;
+      }
+
       .panel {
         margin-top: 20px;
         padding: 20px;
@@ -110,12 +194,22 @@
         color: #f5efe4;
       }
 
-      .panel pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-break: break-word;
-        font-family: "SFMono-Regular", "Menlo", monospace;
-        line-height: 1.7;
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #eadcca;
+        font-size: 13px;
       }
 
       .tips {
@@ -148,56 +242,200 @@
   <body>
     <main class="shell">
       <span class="eyebrow">LazyCat Migration</span>
-      <h1>MarkItDown<br />MCP</h1>
+      <h1>MarkItDown<br />Web + MCP</h1>
       <p class="lead">
-        这个实例运行的是 Microsoft MarkItDown 的 HTTP MCP 服务。根路径提供说明页，真正的 MCP
-        入口位于 <code>/mcp</code> 与 <code>/sse</code>。
+        这个实例同时提供浏览器可用的 Markdown 转换页面，以及 Microsoft MarkItDown 的 HTTP MCP
+        服务。你可以在当前页面上传文件或输入 URL，也可以继续把 MCP 客户端接到 <code>/mcp</code>
+        与 <code>/sse</code>。
       </p>
 
       <section class="grid">
+        <article class="card">
+          <h2>Web Convert</h2>
+          <p>上传文件或提交 URL，直接返回 Markdown 结果。</p>
+          <span class="endpoint">/api/convert</span>
+        </article>
         <article class="card">
           <h2>Streamable HTTP</h2>
           <p>适合新的 MCP 客户端，直接把服务地址指向该端点。</p>
           <span class="endpoint">/mcp</span>
         </article>
         <article class="card">
-          <h2>SSE</h2>
-          <p>兼容基于 Server-Sent Events 的 MCP 调试与集成方式。</p>
-          <span class="endpoint">/sse</span>
-        </article>
-        <article class="card">
-          <h2>Workdir</h2>
-          <p>懒猫数据目录被挂载到容器内 <code>/workdir</code>，可用文件 URI 访问。</p>
-          <span class="endpoint">file:///workdir/&lt;filename&gt;</span>
+          <h2>SSE + Workdir</h2>
+          <p>兼容 SSE 调试；数据目录仍挂载到 <code>/workdir</code>。</p>
+          <span class="endpoint">/sse + file:///workdir/&lt;filename&gt;</span>
         </article>
       </section>
 
+      <section class="stack">
+        <form class="composer" id="url-form">
+          <h2>URL 转换</h2>
+          <label>
+            输入远程文件或网页地址
+            <input
+              id="uri-input"
+              name="uri"
+              type="url"
+              placeholder="https://example.com/report.pdf"
+              required
+            />
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">转换 URL</button>
+          </div>
+        </form>
+
+        <form class="composer" id="file-form">
+          <h2>文件上传</h2>
+          <label>
+            上传本地文件并直接转换
+            <input id="file-input" name="file" type="file" required />
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">上传并转换</button>
+          </div>
+        </form>
+      </section>
+
       <section class="panel">
-        <pre>{
-  "tool": "convert_to_markdown",
-  "examples": [
-    "https://example.com/report.pdf",
-    "file:///workdir/sample.docx",
-    "data:text/plain;base64,SGVsbG8sIE1hcmtJdERvd24h"
-  ]
-}</pre>
+        <h2>转换结果</h2>
+        <div class="meta">
+          <span class="pill" id="status-pill">等待请求</span>
+          <span class="pill" id="source-pill">来源: -</span>
+        </div>
+        <textarea id="result-output" readonly placeholder="转换后的 Markdown 会显示在这里"></textarea>
+        <div class="actions" style="margin-top: 14px;">
+          <button class="secondary" id="copy-button" type="button">复制结果</button>
+          <button class="ghost" id="download-button" type="button">下载 .md</button>
+        </div>
       </section>
 
       <section class="tips">
         <article class="tip">
-          <strong>Inspector 调试</strong>
+          <strong>浏览器使用</strong>
+          页面会向同域名下的 <code>/api/convert</code> 发起请求，支持 JSON 和文件上传两种方式。
+        </article>
+        <article class="tip">
+          <strong>MCP 调试</strong>
           使用 MCP Inspector 时，把服务地址设置为当前应用域名下的 <code>/mcp</code>。
         </article>
         <article class="tip">
-          <strong>本地文件</strong>
-          先把待转换文件放到懒猫的 <code>/lzcapp/var/data</code>，再通过
-          <code>file:///workdir/...</code> 调用。
-        </article>
-        <article class="tip">
           <strong>注意事项</strong>
-          该服务默认不带认证；如需公网使用，请结合上层路由或网关策略控制访问。
+          服务默认不带认证；如需公网使用，请结合上层路由或网关策略控制访问。
         </article>
       </section>
     </main>
+    <script>
+      const urlForm = document.getElementById("url-form");
+      const fileForm = document.getElementById("file-form");
+      const resultOutput = document.getElementById("result-output");
+      const statusPill = document.getElementById("status-pill");
+      const sourcePill = document.getElementById("source-pill");
+      const copyButton = document.getElementById("copy-button");
+      const downloadButton = document.getElementById("download-button");
+
+      let lastFilename = "markitdown-output.md";
+
+      function setStatus(text) {
+        statusPill.textContent = text;
+      }
+
+      function setSource(text) {
+        sourcePill.textContent = `来源: ${text || "-"}`;
+      }
+
+      function showResult(payload) {
+        resultOutput.value = payload.markdown || "";
+        lastFilename = payload.filename || "markitdown-output.md";
+        setStatus("转换完成");
+        setSource(payload.source || payload.source_type || "-");
+      }
+
+      function showError(message) {
+        resultOutput.value = "";
+        setStatus("请求失败");
+        setSource(message);
+      }
+
+      async function requestConvert(options) {
+        setStatus("转换中...");
+        setSource("-");
+
+        try {
+          const response = await fetch("/api/convert", options);
+          const payload = await response.json();
+
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.error || `HTTP ${response.status}`);
+          }
+
+          showResult(payload);
+        } catch (error) {
+          showError(error.message || "Unknown error");
+        }
+      }
+
+      urlForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const uri = document.getElementById("uri-input").value.trim();
+        if (!uri) {
+          showError("请输入 URL");
+          return;
+        }
+
+        await requestConvert({
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            accept: "application/json"
+          },
+          body: JSON.stringify({ uri })
+        });
+      });
+
+      fileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const input = document.getElementById("file-input");
+        if (!input.files || !input.files.length) {
+          showError("请选择文件");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", input.files[0]);
+
+        await requestConvert({
+          method: "POST",
+          headers: {
+            accept: "application/json"
+          },
+          body: formData
+        });
+      });
+
+      copyButton.addEventListener("click", async () => {
+        if (!resultOutput.value) {
+          return;
+        }
+
+        await navigator.clipboard.writeText(resultOutput.value);
+        setStatus("已复制到剪贴板");
+      });
+
+      downloadButton.addEventListener("click", () => {
+        if (!resultOutput.value) {
+          return;
+        }
+
+        const blob = new Blob([resultOutput.value], { type: "text/markdown;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = lastFilename;
+        link.click();
+        URL.revokeObjectURL(url);
+        setStatus("已下载 Markdown");
+      });
+    </script>
   </body>
 </html>

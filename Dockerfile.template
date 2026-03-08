@@ -15,10 +15,15 @@ WORKDIR /app
 
 COPY packages/markitdown /app/packages/markitdown
 COPY packages/markitdown-mcp /app/packages/markitdown-mcp
+COPY lazycat /app/lazycat
 
 RUN pip --no-cache-dir install \
     /app/packages/markitdown[all] \
-    /app/packages/markitdown-mcp
+    /app/packages/markitdown-mcp \
+    python-multipart
+
+RUN chmod +x /app/lazycat/launcher.sh \
+    && ln -sf /app/lazycat/launcher.sh /usr/local/bin/lazycat-markitdown
 
 WORKDIR /workdir
 
@@ -27,4 +32,4 @@ ARG GROUPID=nogroup
 
 USER $USERID:$GROUPID
 
-ENTRYPOINT ["markitdown-mcp"]
+ENTRYPOINT ["lazycat-markitdown"]
