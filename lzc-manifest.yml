@@ -18,10 +18,12 @@ application:
     - /messages/
   upstreams:
     - location: /mcp
-      backend: http://markitdown-mcp:3001/
+      backend: http://markitdown-mcp:3001/mcp
     - location: /sse
-      backend: http://markitdown-mcp:3001/
+      backend: http://markitdown-mcp:3001/sse
     - location: /messages/
+      backend: http://markitdown-mcp:3001/messages/
+    - location: /_lzc_probe
       backend: http://markitdown-mcp:3001/
 services:
   markitdown-mcp:
