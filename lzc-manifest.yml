@@ -30,7 +30,7 @@ application:
       backend: http://markitdown:3000/healthz
 services:
   markitdown:
-    image: registry.lazycat.cloud/invokerlaw/codeeagle/markitdown:35c3fc38f20dea6a
+    image: registry.lazycat.cloud/invokerlaw/codeeagle/markitdown:d158199cb98e7d1e
     command: all
     environment:
       - MARKITDOWN_ENABLE_PLUGINS=true
