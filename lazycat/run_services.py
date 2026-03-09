@@ -23,7 +23,7 @@ def terminate_children(signum, _frame) -> None:
 def main() -> None:
     commands = [
         ["python", "/app/packages/lazycat-markitdown-web/markitdown_web.py", "--host", "0.0.0.0", "--port", "3000"],
-        ["markitdown-mcp", "--http", "--host", "0.0.0.0", "--port", "3001"],
+        ["python", "/app/packages/lazycat-markitdown-web/markitdown_mcp.py", "--http", "--host", "0.0.0.0", "--port", "3001"],
     ]
 
     signal.signal(signal.SIGTERM, terminate_children)

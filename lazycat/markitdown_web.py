@@ -1,25 +1,17 @@
 import argparse
-import io
 import os
 from pathlib import Path
 
 import uvicorn
-from markitdown import MarkItDown, StreamInfo
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
 
+from markitdown_convert import convert_upload, convert_uri
+
 
 DEFAULT_MAX_UPLOAD_BYTES = 25 * 1024 * 1024
-
-
-def plugins_enabled() -> bool:
-    return os.getenv("MARKITDOWN_ENABLE_PLUGINS", "false").strip().lower() in (
-        "true",
-        "1",
-        "yes",
-    )
 
 
 def max_upload_bytes() -> int:
@@ -31,11 +23,6 @@ def max_upload_bytes() -> int:
         return int(raw_value)
     except ValueError:
         return DEFAULT_MAX_UPLOAD_BYTES
-
-
-def build_converter() -> MarkItDown:
-    return MarkItDown(enable_plugins=plugins_enabled())
-
 
 def response_payload(*, markdown: str, source: str, source_type: str, filename: str | None) -> dict:
     return {
@@ -95,7 +82,6 @@ async def convert(request: Request):
         return oversized
 
     try:
-        converter = build_converter()
         content_type = request.headers.get("content-type", "")
 
         if content_type.startswith("application/json"):
@@ -104,9 +90,8 @@ async def convert(request: Request):
             if not uri:
                 return json_error("Missing required field: uri", 400)
 
-            result = converter.convert_uri(uri)
             response = response_payload(
-                markdown=result.markdown,
+                markdown=convert_uri(uri),
                 source=uri,
                 source_type="uri",
                 filename=markdown_name(uri),
@@ -123,25 +108,19 @@ async def convert(request: Request):
                     return json_error(f"Uploaded file is too large. Limit: {limit_mb} MB.", 413)
 
                 extension = Path(upload.filename).suffix or None
-                stream_info = StreamInfo(
-                    filename=upload.filename,
-                    extension=extension,
-                    mimetype=(upload.content_type or None),
-                )
-                result = converter.convert_stream(
-                    io.BytesIO(upload_bytes),
-                    stream_info=stream_info,
-                )
                 response = response_payload(
-                    markdown=result.markdown,
+                    markdown=convert_upload(
+                        upload_bytes,
+                        filename=upload.filename,
+                        mimetype=(upload.content_type or None),
+                    ),
                     source=upload.filename,
                     source_type="upload",
                     filename=markdown_name(upload.filename),
                 )
             elif uri:
-                result = converter.convert_uri(uri)
                 response = response_payload(
-                    markdown=result.markdown,
+                    markdown=convert_uri(uri),
                     source=uri,
                     source_type="uri",
                     filename=markdown_name(uri),

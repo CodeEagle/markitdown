@@ -12,7 +12,7 @@ case "$mode" in
     exec python /app/packages/lazycat-markitdown-web/run_services.py "$@"
     ;;
   mcp)
-    exec markitdown-mcp "$@"
+    exec python /app/packages/lazycat-markitdown-web/markitdown_mcp.py "$@"
     ;;
   web)
     exec python /app/packages/lazycat-markitdown-web/markitdown_web.py "$@"
