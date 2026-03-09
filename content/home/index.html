@@ -244,28 +244,9 @@
       <span class="eyebrow">LazyCat Migration</span>
       <h1>MarkItDown<br />Web + MCP</h1>
       <p class="lead">
-        这个实例同时提供浏览器可用的 Markdown 转换页面，以及 Microsoft MarkItDown 的 HTTP MCP
-        服务。你可以在当前页面上传文件或输入 URL，也可以继续把 MCP 客户端接到 <code>/mcp</code>
-        与 <code>/sse</code>。
+        先在当前页面完成文件或 URL 转换；如果你需要把它接入客户端或自动化流程，再使用后面的 MCP
+        服务说明即可。
       </p>
-
-      <section class="grid">
-        <article class="card">
-          <h2>Web Convert</h2>
-          <p>上传文件或提交 URL，直接返回 Markdown 结果。</p>
-          <span class="endpoint">/api/convert</span>
-        </article>
-        <article class="card">
-          <h2>Streamable HTTP</h2>
-          <p>适合新的 MCP 客户端，直接把服务地址指向该端点。</p>
-          <span class="endpoint">/mcp</span>
-        </article>
-        <article class="card">
-          <h2>SSE + Workdir</h2>
-          <p>兼容 SSE 调试；数据目录仍挂载到 <code>/workdir</code>。</p>
-          <span class="endpoint">/sse + file:///workdir/&lt;filename&gt;</span>
-        </article>
-      </section>
 
       <section class="stack">
         <form class="composer" id="url-form">
@@ -308,6 +289,24 @@
           <button class="secondary" id="copy-button" type="button">复制结果</button>
           <button class="ghost" id="download-button" type="button">下载 .md</button>
         </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Web Convert API</h2>
+          <p>如果不想使用页面交互，也可以直接请求同域名下的转换接口。</p>
+          <span class="endpoint">/api/convert</span>
+        </article>
+        <article class="card">
+          <h2>Streamable HTTP</h2>
+          <p>适合新的 MCP 客户端，直接把服务地址指向该端点。</p>
+          <span class="endpoint">/mcp</span>
+        </article>
+        <article class="card">
+          <h2>SSE + Workdir</h2>
+          <p>兼容 SSE 调试；数据目录仍挂载到 <code>/workdir</code>。</p>
+          <span class="endpoint">/sse + file:///workdir/&lt;filename&gt;</span>
+        </article>
       </section>
 
       <section class="tips">
