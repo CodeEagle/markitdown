@@ -16,6 +16,7 @@ application:
     - /api/
     - /mcp
     - /sse
+    - /sse/
     - /messages/
   upstreams:
     - location: /api/
@@ -24,6 +25,8 @@ application:
       backend: http://markitdown:3001/mcp
     - location: /sse
       backend: http://markitdown:3001/sse
+    - location: /sse/
+      backend: http://markitdown:3001/sse/
     - location: /messages/
       backend: http://markitdown:3001/messages/
     - location: /_lzc_probe

@@ -62,6 +62,7 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         debug=debug,
         routes=[
             Route("/sse", endpoint=handle_sse),
+            Route("/sse/", endpoint=handle_sse),
             Mount("/mcp", app=handle_streamable_http),
             Mount("/messages/", app=sse.handle_post_message),
         ],
