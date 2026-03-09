@@ -86,6 +86,20 @@ curl -X POST "https://<你的应用域名>/api/convert?format=text" \
 - Streamable HTTP: `https://<你的应用域名>/mcp`
 - SSE: `https://<你的应用域名>/sse`
 
+本地也可以直接运行仓库内脚本做最小 MCP 验证：
+
+```bash
+python3 scripts/test_mcp_local.py
+```
+
+测试线上服务：
+
+```bash
+python3 scripts/test_mcp_local.py \
+  --endpoint https://<你的应用域名>/mcp \
+  --insecure
+```
+
 ### 3. 通过 MCP 转换远程文件
 
 通过 MCP 工具 `convert_to_markdown(uri)` 传入：
