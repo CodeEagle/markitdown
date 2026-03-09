@@ -1,4 +1,5 @@
 import argparse
+import io
 import os
 from pathlib import Path
 
@@ -84,18 +85,6 @@ def validate_content_length(request: Request) -> JSONResponse | None:
     return None
 
 
-def uploaded_file_size(upload) -> int | None:
-    file_obj = upload.file
-    if not file_obj.seekable():
-        return None
-
-    current_pos = file_obj.tell()
-    file_obj.seek(0, os.SEEK_END)
-    size = file_obj.tell()
-    file_obj.seek(current_pos)
-    return size
-
-
 async def healthz(_: Request) -> JSONResponse:
     return JSONResponse({"ok": True, "service": "markitdown-web"})
 
@@ -128,19 +117,21 @@ async def convert(request: Request):
             upload = form.get("file")
 
             if upload is not None and getattr(upload, "filename", ""):
-                size = uploaded_file_size(upload)
-                if size is not None and size > max_upload_bytes():
+                upload_bytes = await upload.read()
+                if len(upload_bytes) > max_upload_bytes():
                     limit_mb = max_upload_bytes() // (1024 * 1024)
                     return json_error(f"Uploaded file is too large. Limit: {limit_mb} MB.", 413)
 
-                upload.file.seek(0)
                 extension = Path(upload.filename).suffix or None
                 stream_info = StreamInfo(
                     filename=upload.filename,
                     extension=extension,
                     mimetype=(upload.content_type or None),
                 )
-                result = converter.convert_stream(upload.file, stream_info=stream_info)
+                result = converter.convert_stream(
+                    io.BytesIO(upload_bytes),
+                    stream_info=stream_info,
+                )
                 response = response_payload(
                     markdown=result.markdown,
                     source=upload.filename,
